@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Music Player</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+      body {
+        font-family: 'Arial', sans-serif;
+        text-align: center;
+        margin: 50px;
+      }
+      #audioPlayer {
+        width: 100%; /* Make the audio player take the full width of its container */
+        max-width: 400px; /* Set a maximum width to prevent it from being too wide */
+        margin: 20px auto;
+      }
+      #playlist {
+        list-style: none;
+        padding: 0;
+      }
+      #playlist li {
+        margin: 5px;
+        cursor: pointer;
+        transition: transform 0.3s ease-in-out;
+      }
+      #playlist li:hover {
+        transform: scale(1.1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <audio id="audioPlayer" class="w-100" controls>Your browser does not support the audio element.</audio>
+
+      <ul id="playlist" class="list-group">
+        {% for song in songs %}
+          <li class="list-group-item" onclick="playSong('{{ song.audio_file.url }}')">{{ song.title }} - {{ song.artist }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+      const audioPlayer = document.getElementById('audioPlayer')
+      
+      function playSong(songSrc) {
+        // Reset scaling for all list items
+        document.querySelectorAll('#playlist li').forEach((item) => {
+          item.style.transform = 'scale(1)'
+        })
+      
+        // Set scaling for the clicked item
+        event.target.style.transform = 'scale(1.2)'
+      
+        // Play the selected song
+        audioPlayer.src = songSrc
+        audioPlayer.play()
+      }
+    </script>
+  </body>
+</html>
