@@ -37,7 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'music_player_app'
+    'music_player_app',
+    'api',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -129,3 +131,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Configure media settings for file uploads
 MEDIA_URL = '/'
 MEDIA_ROOT = BASE_DIR / ''
+
+
+LOGIN_URL = '/login/'
+
+
+LOGIN_REDIRECT_URL = '/'
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]

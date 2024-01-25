@@ -4,8 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Music Player</title>
-    <!-- Include Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
       body {
         font-family: 'Arial', sans-serif;
@@ -13,8 +12,8 @@
         margin: 50px;
       }
       #audioPlayer {
-        width: 100%; /* Make the audio player take the full width of its container */
-        max-width: 400px; /* Set a maximum width to prevent it from being too wide */
+        width: 100%;
+        max-width: 400px;
         margin: 20px auto;
       }
       #playlist {
@@ -25,9 +24,16 @@
         margin: 5px;
         cursor: pointer;
         transition: transform 0.3s ease-in-out;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
       }
       #playlist li:hover {
         transform: scale(1.1);
+      }
+      .btnlogout{
+        
+
       }
     </style>
   </head>
@@ -35,32 +41,75 @@
     <div class="container">
       <audio id="audioPlayer" class="w-100" controls>Your browser does not support the audio element.</audio>
 
-      <ul id="playlist" class="list-group">
-        {% for song in songs %}
-          <li class="list-group-item" onclick="playSong('{{ song.audio_file.url }}')">{{ song.title }} - {{ song.artist }}</li>
-        {% endfor %}
-      </ul>
+      <ul id="playlist" class="list-group"></ul>
+      <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#addSongModal" onclick="AddSong()">
+        Add Song
+      </button>
+      <button type="button" class="btnlogout btn btn-danger mt-3" data-toggle="modal" data-target="#addSongModal" onclick="Logout()">
+        Logout
+      </button>
     </div>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        fetchSongs();
+    });
       const audioPlayer = document.getElementById('audioPlayer')
+      const playlist = document.getElementById('playlist')
+      function fetchSongs() {
+          fetch('/api/songs/')
+          .then(response => response.json())
+          .then( songs => {
+              songs.forEach(song => {
+                playlist.innerHTML+=`<li class="list-group-item" onclick="playSong('${song.audio_file}')"><span>${song.title} - ${song.artist}</span>
+                  <div>
+                    <button class="btn btn-info btn-sm" onclick="UpdateSong(${song.id})">Update</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteSong(${song.id})">Delete</button>
+                  </div></li>`
+                console.log(song)
+              });
+          })
+          .catch(error => console.error('Error fetching data:', error));      
+      }
       
       function playSong(songSrc) {
-        // Reset scaling for all list items
         document.querySelectorAll('#playlist li').forEach((item) => {
           item.style.transform = 'scale(1)'
         })
-      
-        // Set scaling for the clicked item
         event.target.style.transform = 'scale(1.2)'
-      
-        // Play the selected song
         audioPlayer.src = songSrc
         audioPlayer.play()
       }
+      function deleteSong(songId) {
+        if (confirm('Are you sure you want to delete this song?')) {
+            fetch(`/api/songs/${songId}/`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+            })
+            .then(response => {
+                if (response.ok) {
+                  location.reload();
+                }
+                else{
+                  alert('Failed to delete the song. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+      }
+      function AddSong() {
+        window.location.href = `/AddSong`;
+    }      
+    function UpdateSong(itemId) {
+      window.location.href = `/UpdateSong/${itemId}`;
+  }
+  function Logout(itemId) {
+    window.location.href = `/logout/`;
+}
     </script>
   </body>
 </html>

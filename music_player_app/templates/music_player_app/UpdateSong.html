@@ -1,0 +1,86 @@
+<!-- music_player_app/templates/music_player_app/update_form.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Update Song</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h2>Update Song</h2>
+      <form id="updateForm">
+        <div class="form-group">
+          <label for="title">Title</label>
+          <input type="text" class="form-control" id="title" name="title" required />
+          <label for="artist">Artist</label>
+          <input type="text" class="form-control" id="artist" name="artist" required />
+          <label for="audio_file">Audio File</label>
+          <input type="file" class="form-control-file" id="audio_file" name="audio_file" accept="audio/*" required />
+        </div>
+        <!-- Add other form fields as needed -->
+
+        <button type="submit" class="btn btn-primary">Update</button>
+      </form>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        // Fetch song data and fill the form fields
+        const url = window.location.pathname.split('/')
+        let songId = url[2]
+        fetch(`/api/songs/${songId}/`)
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById('title').value = data.title
+            document.getElementById('artist').value = data.artist
+            // Assuming you're using a file input for audio_file
+            // If you're using another method for audio_file, adjust accordingly
+            document.getElementById('audio_file').value = ''
+          })
+          .catch((error) => console.error('Error fetching song data:', error))
+      
+        // Submit form with API call
+        document.getElementById('updateForm').addEventListener('submit', function (event) {
+          event.preventDefault()
+      
+          // Get form data
+          const formData = new FormData(this)
+      
+          // Make API call to update song
+          fetch(`/api/songs/${songId}/`, {
+            method: 'PUT',
+            headers: {
+              'X-CSRFToken': getCookie('csrftoken') // Ensure to include CSRF token
+            },
+            body: formData
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              alert('Song updated successfully!')
+              window.location.href = '/home' // Redirect to the song list page
+            })
+            .catch((error) => console.error('Error updating song:', error))
+        })
+      })
+      
+      // Function to get CSRF token from cookies
+      function getCookie(name) {
+        var cookieValue = null
+        if (document.cookie && document.cookie !== '') {
+          var cookies = document.cookie.split(';')
+          for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim()
+            if (cookie.substring(0, name.length + 1) === name + '=') {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1))
+              break
+            }
+          }
+        }
+        return cookieValue
+      }
+    </script>
+  </body>
+</html>

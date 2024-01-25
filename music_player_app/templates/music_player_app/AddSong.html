@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Song</title>
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+
+  <div class="container mt-5">
+    <h2>Add Song</h2>
+
+    <form id="songForm">
+      <div class="form-group">
+        <label for="title">Title:</label>
+        <input type="text" class="form-control" id="title" name="title" required>
+        <div class="invalid-feedback">Title is required.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="artist">Artist:</label>
+        <input type="text" class="form-control" id="artist" name="artist" required>
+        <div class="invalid-feedback">Artist is required.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="audio_file">Audio File:</label>
+        <input type="file" class="form-control-file" id="audio_file" name="audio_file" accept="audio/*" required>
+        <div class="invalid-feedback">Audio file is required.</div>
+      </div>
+
+      <button type="button" class="btn btn-primary" onclick="postData()">Submit</button>
+    </form>
+
+  </div>
+
+  <!-- Bootstrap JS and dependencies -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+  <script>
+    function postData() {
+        // Validate the form
+        if (validateForm()) {
+            let title = document.getElementById('title').value;
+            let artist = document.getElementById('artist').value;
+            let audio_file = document.getElementById('audio_file').files[0];
+
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('artist', artist);
+            formData.append('audio_file', audio_file);
+
+            fetch('http://127.0.0.1:8000/api/songs/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'), 
+                },
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log('Success:', result);
+                // Refresh the page after successful submission
+                location.reload();
+            })
+            .catch(error => {
+              // Handle errors as needed
+                console.error('Error:', error);
+            });
+        }
+    }
+
+    function validateForm() {
+        const title = document.getElementById('title').value;
+        const artist = document.getElementById('artist').value;
+        const audio_file = document.getElementById('audio_file').files[0];
+
+        const invalidFeedbacks = document.querySelectorAll('.invalid-feedback');
+        invalidFeedbacks.forEach(element => {
+            element.style.display = 'none';
+        });
+
+        let isValid = true;
+
+        if (!title.trim()) {
+            document.getElementById('title').nextElementSibling.style.display = 'block';
+            isValid = false;
+        }
+
+        if (!artist.trim()) {
+            document.getElementById('artist').nextElementSibling.style.display = 'block';
+            isValid = false;
+        }
+
+        if (!audio_file) {
+            document.getElementById('audio_file').nextElementSibling.style.display = 'block';
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    // Function to get CSRF token from cookies
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+  </script>
+
+</body>
+</html>

@@ -1,10 +1,7 @@
 # music_player_app/admin.py
 
 from django.contrib import admin
-from .models import Song
+from django.contrib.auth.admin import UserAdmin
+from .models import CustomUser
 
-class SongAdmin(admin.ModelAdmin):
-    list_display = ('title', 'artist', )
-    search_fields = ('title', 'artist')
-
-admin.site.register(Song, SongAdmin)
+admin.site.register(CustomUser, UserAdmin)
