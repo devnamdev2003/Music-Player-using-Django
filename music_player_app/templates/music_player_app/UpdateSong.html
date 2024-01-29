@@ -21,6 +21,8 @@
           <input type="text" class="form-control" id="categorie" name="categorie" required />
           <label for="audio_file">Audio File</label>
           <input type="file" class="form-control-file" id="audio_file" name="audio_file" accept="audio/*" required />
+          <label for="audio_img">Audio Img</label>
+          <input type="file" class="form-control-file" id="audio_img" name="audio_img" required />
         </div>
         <!-- Add other form fields as needed -->
 
@@ -40,6 +42,7 @@
             document.getElementById('artist').value = data.artist
             document.getElementById('categorie').value = data.categorie
             document.getElementById('audio_file').value = ''
+            document.getElementById('audio_img').value = ''
           })
           .catch((error) => console.error('Error fetching song data:', error))
       

@@ -35,6 +35,11 @@
           <input type="file" class="form-control-file" id="audio_file" name="audio_file" accept="audio/*" required />
           <div class="invalid-feedback">Audio file is required.</div>
         </div>
+        <div class="form-group">
+          <label for="audio_img">Audio Img:</label>
+          <input type="file" class="form-control-file" id="audio_img" name="audio_img" required />
+          <div class="invalid-feedback">Audio Img is required.</div>
+        </div>
 
         <button type="button" class="btn btn-primary" onclick="postData()">Submit</button>
       </form>
@@ -53,12 +58,14 @@
           let artist = document.getElementById('artist').value
           let categorie = document.getElementById('categorie').value
           let audio_file = document.getElementById('audio_file').files[0]
+          let audio_img = document.getElementById('audio_img').files[0]
       
           const formData = new FormData()
           formData.append('title', title)
           formData.append('artist', artist)
           formData.append('categorie', categorie)
           formData.append('audio_file', audio_file)
+          formData.append('audio_img', audio_img)
       
           fetch('http://127.0.0.1:8000/api/songs/', {
             method: 'POST',
@@ -85,6 +92,7 @@
         const artist = document.getElementById('artist').value
         const categorie = document.getElementById('categorie').value
         const audio_file = document.getElementById('audio_file').files[0]
+        const audio_img = document.getElementById('audio_img').files[0]
         const invalidFeedbacks = document.querySelectorAll('.invalid-feedback')
         invalidFeedbacks.forEach((element) => {
           element.style.display = 'none'
@@ -108,6 +116,10 @@
       
         if (!audio_file) {
           document.getElementById('audio_file').nextElementSibling.style.display = 'block'
+          isValid = false
+        }
+        if (!audio_img) {
+          document.getElementById('audio_img').nextElementSibling.style.display = 'block'
           isValid = false
         }
       

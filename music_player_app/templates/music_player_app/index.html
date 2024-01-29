@@ -35,7 +35,11 @@
   </head>
   <body>
     <div class="container">
+      <div class="player">
+        <img style="width:250px; height:250px;"src="https://th.bing.com/th/id/OIP.bLCU8HwL546JIVk9vLV3NAHaHa?rs=1&pid=ImgDetMain" alt="" id="audioPlayerimg">
+      <br>
       <audio id="audioPlayer" class="w-100" controls>Your browser does not support the audio element.</audio>
+      </div>
       <!-- Filter options -->
 <label for="filterArtist">Filter by Artist:</label>
 <input type="text" id="filterArtist" oninput="filterSongs()" placeholder="Enter artist name">
@@ -57,6 +61,7 @@
       });
     
       const audioPlayer = document.getElementById('audioPlayer');
+      const audioPlayerimg = document.getElementById('audioPlayerimg');
       const playlist = document.getElementById('playlist');
     
       function fetchSongs() {
@@ -64,7 +69,7 @@
           .then(response => response.json())
           .then(songs => {
             songs.forEach(song => {
-              playlist.innerHTML += `<li class="list-group-item" onclick="playSong('${song.audio_file}')"><span>${song.title} - ${song.artist}-${song.categorie}</span>
+              playlist.innerHTML += `<li class="list-group-item" onclick="playSong('${song.audio_file}','${song.audio_img}')"><span>${song.title} - ${song.artist}-${song.categorie}</span>
                 <div>
                   <button class="btn btn-info btn-sm" onclick="UpdateSong(${song.id})">Update</button>
                   <button class="btn btn-danger btn-sm" onclick="deleteSong(${song.id})">Delete</button>
@@ -74,12 +79,16 @@
           .catch(error => console.error('Error fetching data:', error));
       }
     
-      function playSong(songSrc) {
+      function playSong(songSrc,songimg) {
+        console.log(songSrc);
+        console.log(songimg);
         document.querySelectorAll('#playlist li').forEach((item) => {
           item.style.transform = 'scale(1)';
         });
         event.target.style.transform = 'scale(1.2)';
         audioPlayer.src = songSrc;
+        console.log(audioPlayerimg);
+        audioPlayerimg.src = songimg;
         audioPlayer.play();
       }
     
