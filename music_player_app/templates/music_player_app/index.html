@@ -31,15 +31,17 @@
       #playlist li:hover {
         transform: scale(1.1);
       }
-      .btnlogout{
-        
-
-      }
     </style>
   </head>
   <body>
     <div class="container">
       <audio id="audioPlayer" class="w-100" controls>Your browser does not support the audio element.</audio>
+      <!-- Filter options -->
+<label for="filterArtist">Filter by Artist:</label>
+<input type="text" id="filterArtist" oninput="filterSongs()" placeholder="Enter artist name">
+
+<label for="filterType">Filter by Type:</label>
+<input type="text" id="filterType" oninput="filterSongs()" placeholder="Enter song type">
 
       <ul id="playlist" class="list-group"></ul>
       <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#addSongModal" onclick="AddSong()">
@@ -52,64 +54,96 @@
     <script>
       document.addEventListener('DOMContentLoaded', function () {
         fetchSongs();
-    });
-      const audioPlayer = document.getElementById('audioPlayer')
-      const playlist = document.getElementById('playlist')
+      });
+    
+      const audioPlayer = document.getElementById('audioPlayer');
+      const playlist = document.getElementById('playlist');
+    
       function fetchSongs() {
-          fetch('/api/songs/')
+        fetch('/api/songs/')
           .then(response => response.json())
-          .then( songs => {
-              songs.forEach(song => {
-                playlist.innerHTML+=`<li class="list-group-item" onclick="playSong('${song.audio_file}')"><span>${song.title} - ${song.artist}</span>
-                  <div>
-                    <button class="btn btn-info btn-sm" onclick="UpdateSong(${song.id})">Update</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteSong(${song.id})">Delete</button>
-                  </div></li>`
-                console.log(song)
-              });
+          .then(songs => {
+            songs.forEach(song => {
+              playlist.innerHTML += `<li class="list-group-item" onclick="playSong('${song.audio_file}')"><span>${song.title} - ${song.artist}-${song.categorie}</span>
+                <div>
+                  <button class="btn btn-info btn-sm" onclick="UpdateSong(${song.id})">Update</button>
+                  <button class="btn btn-danger btn-sm" onclick="deleteSong(${song.id})">Delete</button>
+                </div></li>`;
+            });
           })
-          .catch(error => console.error('Error fetching data:', error));      
+          .catch(error => console.error('Error fetching data:', error));
       }
-      
+    
       function playSong(songSrc) {
         document.querySelectorAll('#playlist li').forEach((item) => {
-          item.style.transform = 'scale(1)'
-        })
-        event.target.style.transform = 'scale(1.2)'
-        audioPlayer.src = songSrc
-        audioPlayer.play()
+          item.style.transform = 'scale(1)';
+        });
+        event.target.style.transform = 'scale(1.2)';
+        audioPlayer.src = songSrc;
+        audioPlayer.play();
       }
+    
       function deleteSong(songId) {
         if (confirm('Are you sure you want to delete this song?')) {
-            fetch(`/api/songs/${songId}/`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}',
-                },
-            })
+          fetch(`/api/songs/${songId}/`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': '{{ csrf_token }}',
+            },
+          })
             .then(response => {
-                if (response.ok) {
-                  location.reload();
-                }
-                else{
-                  alert('Failed to delete the song. Please try again.');
-                }
+              if (response.ok) {
+                location.reload();
+              } else {
+                alert('Failed to delete the song. Please try again.');
+              }
             })
             .catch(error => {
-                console.error('Error:', error);
+              console.error('Error:', error);
             });
         }
       }
+    
       function AddSong() {
         window.location.href = `/AddSong`;
-    }      
-    function UpdateSong(itemId) {
-      window.location.href = `/UpdateSong/${itemId}`;
-  }
-  function Logout(itemId) {
-    window.location.href = `/logout/`;
-}
+      }
+    
+      function UpdateSong(itemId) {
+        window.location.href = `/UpdateSong/${itemId}`;
+      }
+    
+      function Logout(itemId) {
+        window.location.href = `/logout/`;
+      }
+    
+      // Add filter function
+      function filterSongs() {
+        const filterArtist = document.getElementById('filterArtist').value.toLowerCase();
+        const filterType = document.getElementById('filterType').value.toLowerCase();
+    
+        fetch('/api/songs/')
+          .then(response => response.json())
+          .then(songs => {
+            playlist.innerHTML = ''; // Clear the existing list
+            songs.forEach(song => {
+              console.log(songs);
+              // Check if the song matches the filters
+              if (
+                (filterArtist === '' || song.artist.toLowerCase().includes(filterArtist)) &&
+                (filterType === '' || song.categorie.toLowerCase().includes(filterType))
+              ) {
+                playlist.innerHTML += `<li class="list-group-item" onclick="playSong('${song.audio_file}')"><span>${song.title} - ${song.artist}-${song.categorie}</span>
+                  <div>
+                    <button class="btn btn-info btn-sm" onclick="UpdateSong(${song.id})">Update</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteSong(${song.id})">Delete</button>
+                  </div></li>`;
+              }
+            });
+          })
+          .catch(error => console.error('Error fetching data:', error));
+      }
     </script>
+    
   </body>
 </html>
