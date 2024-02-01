@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Music Player</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
     <style>
       body {
         font-family: 'Arial', sans-serif;
@@ -36,123 +36,127 @@
   <body>
     <div class="container">
       <div class="player">
-        <img style="width:250px; height:250px;"src="https://th.bing.com/th/id/OIP.bLCU8HwL546JIVk9vLV3NAHaHa?rs=1&pid=ImgDetMain" alt="" id="audioPlayerimg">
-      <br>
-      <audio id="audioPlayer" class="w-100" controls>Your browser does not support the audio element.</audio>
+        <img style="width:250px; height:250px;" src="https://th.bing.com/th/id/OIP.bLCU8HwL546JIVk9vLV3NAHaHa?rs=1&pid=ImgDetMain" alt id="audioPlayerimg" />
+        <br />
+        <audio id="audioPlayer" class="w-100" controls>Your browser does not support the audio element.</audio>
       </div>
-      <!-- Filter options -->
-<label for="filterArtist">Filter by Artist:</label>
-<input type="text" id="filterArtist" oninput="filterSongs()" placeholder="Enter artist name">
-
-<label for="filterType">Filter by Type:</label>
-<input type="text" id="filterType" oninput="filterSongs()" placeholder="Enter song type">
-
+      <label for="Search">Search Song:</label>
+      <input type="text" id="Search"  placeholder="Enter song name" />
+      <button onclick="SearchSongs()">Search</button>
       <ul id="playlist" class="list-group"></ul>
-      <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#addSongModal" onclick="AddSong()">
-        Add Song
-      </button>
-      <button type="button" class="btnlogout btn btn-danger mt-3" data-toggle="modal" data-target="#addSongModal" onclick="Logout()">
-        Logout
-      </button>
+      <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#addSongModal" onclick="AddSong()">Add Song</button>
+      <button type="button" class="btnlogout btn btn-danger mt-3" data-toggle="modal" data-target="#addSongModal" onclick="Logout()">Logout</button>
     </div>
     <script>
-      document.addEventListener('DOMContentLoaded', function () {
-        fetchSongs();
-      });
-    
-      const audioPlayer = document.getElementById('audioPlayer');
-      const audioPlayerimg = document.getElementById('audioPlayerimg');
-      const playlist = document.getElementById('playlist');
-    
-      function fetchSongs() {
-        fetch('/api/songs/')
-          .then(response => response.json())
-          .then(songs => {
-            songs.forEach(song => {
+      
+document.addEventListener('DOMContentLoaded', function () {
+  fetchSongs();
+});
+
+const audioPlayer = document.getElementById('audioPlayer');
+const audioPlayerimg = document.getElementById('audioPlayerimg');
+const playlist = document.getElementById('playlist');
+
+function fetchSongs() {
+  fetch('/api/songs/')
+      .then(response => response.json())
+      .then(songs => {
+          songs.forEach(song => {
               playlist.innerHTML += `<li class="list-group-item" onclick="playSong('${song.audio_file}','${song.audio_img}')"><span>${song.title} - ${song.artist}-${song.categorie}</span>
-                <div>
-                  <button class="btn btn-info btn-sm" onclick="UpdateSong(${song.id})">Update</button>
-                  <button class="btn btn-danger btn-sm" onclick="deleteSong(${song.id})">Delete</button>
-                </div></li>`;
-            });
-          })
-          .catch(error => console.error('Error fetching data:', error));
-      }
-    
-      function playSong(songSrc,songimg) {
-        console.log(songSrc);
-        console.log(songimg);
-        document.querySelectorAll('#playlist li').forEach((item) => {
-          item.style.transform = 'scale(1)';
-        });
-        event.target.style.transform = 'scale(1.2)';
-        audioPlayer.src = songSrc;
-        console.log(audioPlayerimg);
-        audioPlayerimg.src = songimg;
-        audioPlayer.play();
-      }
-    
-      function deleteSong(songId) {
-        if (confirm('Are you sure you want to delete this song?')) {
-          fetch(`/api/songs/${songId}/`, {
-            method: 'DELETE',
-            headers: {
+              <div>
+                <button class="btn btn-info btn-sm" onclick="UpdateSong(${song.id})">Update</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteSong(${song.id})">Delete</button>
+              </div></li>`;
+          });
+      })
+      .catch(error => console.error('Error fetching data:', error));
+}
+
+function playSong(songSrc, songimg) {
+  console.log(songSrc);
+  console.log(songimg);
+  document.querySelectorAll('#playlist li').forEach((item) => {
+      item.style.transform = 'scale(1)';
+  });
+  event.target.style.transform = 'scale(1.2)';
+  audioPlayer.src = songSrc;
+  console.log(audioPlayerimg);
+  audioPlayerimg.src = songimg;
+  audioPlayer.play();
+}
+
+function deleteSong(songId) {
+  if (confirm('Are you sure you want to delete this song?')) {
+      fetch(`/api/songs/${songId}/`, {
+          method: 'DELETE',
+          headers: {
               'Content-Type': 'application/json',
               'X-CSRFToken': '{{ csrf_token }}',
-            },
-          })
-            .then(response => {
+          },
+      })
+          .then(response => {
               if (response.ok) {
-                location.reload();
+                  location.reload();
               } else {
-                alert('Failed to delete the song. Please try again.');
+                  alert('Failed to delete the song. Please try again.');
               }
-            })
-            .catch(error => {
-              console.error('Error:', error);
-            });
-        }
-      }
-    
-      function AddSong() {
-        window.location.href = `/AddSong`;
-      }
-    
-      function UpdateSong(itemId) {
-        window.location.href = `/UpdateSong/${itemId}`;
-      }
-    
-      function Logout(itemId) {
-        window.location.href = `/logout/`;
-      }
-    
-      // Add filter function
-      function filterSongs() {
-        const filterArtist = document.getElementById('filterArtist').value.toLowerCase();
-        const filterType = document.getElementById('filterType').value.toLowerCase();
-    
-        fetch('/api/songs/')
-          .then(response => response.json())
-          .then(songs => {
-            playlist.innerHTML = ''; // Clear the existing list
-            songs.forEach(song => {
-              console.log(songs);
-              // Check if the song matches the filters
-              if (
-                (filterArtist === '' || song.artist.toLowerCase().includes(filterArtist)) &&
-                (filterType === '' || song.categorie.toLowerCase().includes(filterType))
-              ) {
-                playlist.innerHTML += `<li class="list-group-item" onclick="playSong('${song.audio_file}')"><span>${song.title} - ${song.artist}-${song.categorie}</span>
-                  <div>
-                    <button class="btn btn-info btn-sm" onclick="UpdateSong(${song.id})">Update</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteSong(${song.id})">Delete</button>
-                  </div></li>`;
-              }
-            });
           })
-          .catch(error => console.error('Error fetching data:', error));
-      }
+          .catch(error => {
+              console.error('Error:', error);
+          });
+  }
+}
+
+function AddSong() {
+  window.location.href = `/AddSong`;
+}
+
+function UpdateSong(itemId) {
+  window.location.href = `/UpdateSong/${itemId}`;
+}
+
+function Logout(itemId) {
+  window.location.href = `/logout/`;
+}
+function SearchSongs() {
+  const SearchSong = document.getElementById('Search').value.toLowerCase();
+  // Saavn API endpoint for searching songs
+  const saavnSearchUrl = 'https://saavn.me/search/songs';
+
+  // Query parameters for the search
+  const params = {
+      query: SearchSong,
+  };
+
+  // Request headers
+  const headers = {
+      'Content-Type': 'application/json',
+  };
+
+  // Make the GET request to search for songs
+  fetch(`${saavnSearchUrl}?${new URLSearchParams(params)}`, {
+      method: 'GET',
+      headers: headers,
+  })
+      .then(response => response.json())
+      .then(songData => {
+          playlist.innerHTML = '';
+          for (const song of songData.data.results) {
+              const songName = song.name;
+              const artistName = song.primaryArtists;
+              const highestQualityDownloadUrl = song.downloadUrl.find(downloadUrl => downloadUrl.quality === '320kbps');
+              const image150x150 = song.image.find(image => image.quality === '150x150');
+              const lowestQualityImage = song.image.find(image => image.quality === '50x50');
+              playlist.innerHTML += `<li class="list-group-item" onclick="playSong('${highestQualityDownloadUrl.link}','${image150x150.link}')"><span>
+            <img src="${lowestQualityImage.link}">
+            ${songName} by ${artistName}</span>
+            </li>`;
+          }
+      })
+      .catch(error => console.error('Error:', error));
+
+}
+
     </script>
-    
   </body>
 </html>
