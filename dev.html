@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Music Player</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
-    <style>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Music Player</title>
+        <link rel="stylesheet"
+            href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+        <style>
       body {
         font-family: 'Arial', sans-serif;
         text-align: center;
@@ -32,22 +33,30 @@
         transform: scale(1.1);
       }
     </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="player">
-        <img style="width:250px; height:250px;" src="https://th.bing.com/th/id/OIP.bLCU8HwL546JIVk9vLV3NAHaHa?rs=1&pid=ImgDetMain" alt id="audioPlayerimg" />
-        <br />
-        <audio id="audioPlayer" class="w-100" controls>Your browser does not support the audio element.</audio>
-      </div>
-      <label for="Search">Search Song:</label>
-      <input type="text" id="Search" oninput="SearchSongs()" placeholder="Enter song name" />
-      <button onclick="SearchSongs()">Search</button>
-      <ul id="playlist" class="list-group"></ul>
-      <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#addSongModal" onclick="AddSong()">Add Song</button>
-      <button type="button" class="btnlogout btn btn-danger mt-3" data-toggle="modal" data-target="#addSongModal" onclick="Logout()">Logout</button>
-    </div>
-    <script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="player">
+                <img style="width:250px; height:250px;"
+                    src="https://th.bing.com/th/id/OIP.bLCU8HwL546JIVk9vLV3NAHaHa?rs=1&pid=ImgDetMain"
+                    alt id="audioPlayerimg" />
+                <br />
+                <audio id="audioPlayer" class="w-100" controls>Your browser does
+                    not support the audio element.</audio>
+            </div>
+            <label for="Search">Search Song:</label>
+            <input type="text" id="Search" oninput="SearchSongs()"
+                placeholder="Enter song name" />
+            <button onclick="SearchSongs()">Search</button>
+            <ul id="playlist" class="list-group"></ul>
+            <button type="button" class="btn btn-primary mt-3"
+                data-toggle="modal" data-target="#addSongModal"
+                onclick="AddSong()">Add Song</button>
+            <button type="button" class="btnlogout btn btn-danger mt-3"
+                data-toggle="modal" data-target="#addSongModal"
+                onclick="Logout()">Logout</button>
+        </div>
+        <script>
       
 document.addEventListener('DOMContentLoaded', function () {
   fetchSongs();
@@ -140,6 +149,7 @@ function SearchSongs() {
   })
       .then(response => response.json())
       .then(songData => {
+        // console.log(songData.data.results);
           playlist.innerHTML = '';
           for (const song of songData.data.results) {
               const songName = song.name;
@@ -157,5 +167,5 @@ function SearchSongs() {
 }
 
     </script>
-  </body>
+    </body>
 </html>
