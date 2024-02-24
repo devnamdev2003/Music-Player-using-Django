@@ -1,6 +1,0 @@
-<h2>Create Document</h2>
-<form method="post" action="{% url 'editor:create_document' %}">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Save</button>
-</form>
